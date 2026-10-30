@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart'; // 必须导入这个包才能使用苹果风格组件
+import 'package:flutter/cupertino.dart';
 
 void main() {
   runApp(const StudentInfoApp());
@@ -46,6 +46,7 @@ class StudentProfileScreen extends StatelessWidget {
     );
   }
 
+  // 竖屏排版 (去掉了外层的 const 数组声明)
   Widget _buildPortraitView() {
     return ListView(
       children: const [
@@ -55,12 +56,13 @@ class StudentProfileScreen extends StatelessWidget {
           location: 'Sibu, Sarawak',
           starCount: 41,
         ),
-        // 这里加入了全新的选择器模块
+        ImageSection(imagePath: 'assets/uts.jpg'),
         InteractivePickersSection(),
       ],
     );
   }
 
+  // 横屏排版 (修复了 const 问题)
   Widget _buildLandscapeView() {
     return Row(
       children: [
@@ -79,12 +81,37 @@ class StudentProfileScreen extends StatelessWidget {
                 location: 'Sibu, Sarawak',
                 starCount: 41,
               ),
-              // 横屏时选择器模块显示在右侧下方
+              ImageSection(imagePath: 'assets/uts.jpg'),
               InteractivePickersSection(),
             ],
           ),
         ),
       ],
+    );
+  }
+}
+
+// ----------------------------------------------------------------------
+// DECOMPOSED WIDGET 3: Image Section (新增的风景图组件)
+// ----------------------------------------------------------------------
+class ImageSection extends StatelessWidget {
+  final String imagePath;
+
+  const ImageSection({super.key, required this.imagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Image.asset(
+          imagePath,
+          height: 180,
+          width: double.infinity,
+          fit: BoxFit.cover,
+        ),
+      ),
     );
   }
 }
@@ -104,7 +131,6 @@ class _InteractivePickersSectionState extends State<InteractivePickersSection> {
   String _selectedRole = 'Student';
   final List<String> _roles = ['Student', 'Developer', 'Designer'];
 
-  // 1. Material Date Picker
   Future<void> _selectMaterialDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -119,7 +145,6 @@ class _InteractivePickersSectionState extends State<InteractivePickersSection> {
     }
   }
 
-  // 2. Cupertino Date Picker
   void _showCupertinoDatePicker(BuildContext context) {
     showCupertinoModalPopup(
       context: context,
@@ -138,7 +163,6 @@ class _InteractivePickersSectionState extends State<InteractivePickersSection> {
     );
   }
 
-  // 3. Cupertino Wheel Picker
   void _showCupertinoRolePicker(BuildContext context) {
     showCupertinoModalPopup(
       context: context,
@@ -179,8 +203,6 @@ class _InteractivePickersSectionState extends State<InteractivePickersSection> {
               Text('Selected Date: ${_selectedDate.toString().split(' ')[0]}'),
               Text('Selected Role: $_selectedRole'),
               const SizedBox(height: 16),
-
-              // Buttons to trigger pickers
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
@@ -199,8 +221,6 @@ class _InteractivePickersSectionState extends State<InteractivePickersSection> {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Material Dropdown
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -222,7 +242,6 @@ class _InteractivePickersSectionState extends State<InteractivePickersSection> {
                 ],
               ),
               const SizedBox(height: 8),
-
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
@@ -310,33 +329,28 @@ class TitleSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 0.0),
-      child: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(location, style: TextStyle(color: Colors.grey[600])),
-                  ],
+      padding: const EdgeInsets.all(32.0), // 老师和官方教程使用的标准边距
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    name,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
                 ),
-              ),
-              Icon(Icons.star, color: Colors.red[500]),
-              const SizedBox(width: 4),
-              Text('$starCount'),
-            ],
+                Text(location, style: TextStyle(color: Colors.grey[600])),
+              ],
+            ),
           ),
-        ),
+          Icon(Icons.star, color: Colors.red[500]),
+          const SizedBox(width: 4),
+          Text('$starCount'),
+        ],
       ),
     );
   }
